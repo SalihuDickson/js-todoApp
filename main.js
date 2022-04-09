@@ -99,6 +99,7 @@ const toggleStrike = (e, inputElement) => {
     e.target.textContent.toLowerCase() === "done" ? "undone" : "Done";
 
   inputElement.classList.toggle("strike");
+  saveData();
 };
 
 const editItem = (e, inputElement) => {
@@ -114,6 +115,8 @@ const editItem = (e, inputElement) => {
     e.target.textContent = "Edit";
     inputElement.setAttribute("readonly", "readonly");
   }
+
+  saveData();
 };
 
 form.addEventListener("submit", (e) => {
@@ -127,12 +130,10 @@ form.addEventListener("submit", (e) => {
 
   editButton.addEventListener("click", (e) => {
     editItem(e, inputElement);
-    saveData();
   });
 
   doneButton.addEventListener("click", (e) => {
     toggleStrike(e, inputElement);
-    saveData();
   });
 
   deleteButton.addEventListener("click", () => {
