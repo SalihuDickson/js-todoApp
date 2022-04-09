@@ -29,7 +29,7 @@ const isValidInput = (str) => {
 };
 
 const createItem = (savedItem) => {
-  const task = savedItem || input.value;
+  const task = savedItem?.task || input.value;
 
   if (!isValidInput(task)) {
     alert("please enter a valid task");
@@ -61,7 +61,12 @@ const createItem = (savedItem) => {
 
   const doneButton = document.createElement("button");
   doneButton.classList.add("done");
-  doneButton.textContent = "Done";
+  if (savedItem) {
+    doneButton.textContent = savedItem.status === "done" ? "undone" : "done";
+    savedItem.status === "done" && inputElement.classList.toggle("strike");
+  } else {
+    doneButton.textContent = "done";
+  }
 
   const deleteButton = document.createElement("button");
   deleteButton.classList.add("delete");
@@ -86,11 +91,13 @@ const createItem = (savedItem) => {
 
 const deleteItem = (item) => {
   listElement.removeChild(item);
+  saveData();
 };
 
 const toggleStrike = (e, inputElement) => {
   e.target.textContent =
     e.target.textContent.toLowerCase() === "done" ? "undone" : "Done";
+
   inputElement.classList.toggle("strike");
 };
 
@@ -120,19 +127,30 @@ form.addEventListener("submit", (e) => {
 
   editButton.addEventListener("click", (e) => {
     editItem(e, inputElement);
+    saveData();
   });
 
   doneButton.addEventListener("click", (e) => {
     toggleStrike(e, inputElement);
+    saveData();
   });
 
-  deleteButton.addEventListener("click", () => deleteItem(item));
+  deleteButton.addEventListener("click", () => {
+    deleteItem(item);
+  });
 });
 
 const saveData = () => {
   const tasks = listElement.querySelectorAll(".task");
+  if (!tasks[0]) localStorage.removeItem("tasks");
 
   const tasksArr = [];
-  tasks.forEach((task) => tasksArr.push(task.querySelector("input").value));
+  tasks.forEach((task) => {
+    const inputElement = task.querySelector("input");
+    tasksArr.push({
+      task: inputElement.value,
+      status: inputElement.classList.contains("strike") ? "done" : "undone",
+    });
+  });
   localStorage.setItem("tasks", JSON.stringify(tasksArr));
 };
